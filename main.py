@@ -14,16 +14,12 @@ def superReducedString(s):
         return "".join(ls)
 
 
-
 def anagram(s):
     if len(s) % 2 != 0:
         return -1;
     str1 = list(s[0:int(len(s) / 2)])
     str2 = list(s[int(len(s) / 2):len(s)])
-    cnt1 = Counter(str1)
-    cnt2 = Counter(str2)
-    changes = 0;
-    for c in cnt1:
-        changes += (cnt1[c] - cnt2[c])
-    return changes;
+    return sum(max(0, str2.count(c) - str1.count(c)) for c in set(str2))
+
+
 

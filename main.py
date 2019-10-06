@@ -1,7 +1,7 @@
 from collections import Counter
 
 def superReducedString(s):
-    ls = list(s);
+    ls = list(s)
     for ch in range(len(ls)):
         if ch <= len(ls) - 2:
             if ls[ch] == ls[ch+1]:
@@ -22,58 +22,68 @@ def anagram(s):
     return sum(max(0, str2.count(c) - str1.count(c)) for c in set(str2))
 
 
-def twoPluses(grid):
-    biggestPlus = []
+def canExpand(grid, r, c, toExpandBy):
+    if r <= 0 or r-toExpandBy < 0 or r > len(grid) or r+toExpandBy > len(grid):
+        return False
+    if c <= 0 or c-toExpandBy < 0 or c > len(grid[r]) or c+toExpandBy > len(grid[r]):
+        return False
+    if grid[r - toExpandBy][c] == 'B':
+        return False
+    if grid[r + toExpandBy][c] == 'B':
+        return False
+    if grid[r][c + toExpandBy] == 'B':
+        return False
+    if grid[r][c - toExpandBy] == 'B':
+        return False
+    if canExpand:
+        return True
+
+
+def getPluses(grid):
+    pluses = []
+    plus = []
     for r in range(len(grid)):
         for c in range(len(grid[r])):
-            area = 0;
-            expandability = 0
-            canExpand = True
             if grid[r][c] == 'G':
-                area = 1
-            while canExpand:
-                if grid[r - expandability][c] == 'B':
-                    canExpand = False
-                if grid[r + expandability][c] == 'B':
-                    canExpand = False
-                if grid[r][c + expandability] == 'B':
-                    canExpand = False
-                if grid[r][c - expandability] == 'B':
-                    canExpand = False
-                if canExpand:
-                    if expandability > 0:
-                        area += 4
-                    expandability += 1
-            if area > biggestArea:
-                biggestArea = area
-                biggestPlus = [[r, c]]
-                while canExpand:
-                    if grid[r - expandability][c] == 'B':
-                        canExpand = False
-                    if grid[r + expandability][c] == 'B':
-                        canExpand = False
-                    if grid[r][c + expandability] == 'B':
-                        canExpand = False
-                    if grid[r][c - expandability] == 'B':
-                        canExpand = False
-                    if canExpand:
-                        if expandability > 0:
-                            area += 4
-                            biggestPlus.push([r - expandability][c])
-                            biggestPlus.push([r + expandability][c])
-                            biggestPlus.push([r][c + expandability])
-                            biggestPlus.push([r][c - expandability])
-                        expandability += 1
-        for square in biggestPlus:
-            grid[square[0]][square[1]] = 'B'
-    print(biggestPlus)
+                plus.append([r, c])
+                toExpandBy = 1
+                while canExpand(grid, r, c, toExpandBy):
+                    plus.append([r+toExpandBy, c])
+                    plus.append([r, c+toExpandBy])
+                    plus.append([r, c-toExpandBy])
+                    plus.append([r-toExpandBy, c])
+                    toExpandBy += 1
+                pluses.append(plus)
+            plus = []
+    return pluses
 
 
-grid = [['G', 'G', 'G', 'G', 'G', 'G'],
-        ['G', 'B', 'B', 'B', 'G', 'B'],
-        ['G', 'G', 'G', 'G', 'G', 'G'],
-        ['G', 'G', 'B', 'B', 'G', 'B'],
-        ['G', 'G', 'G', 'G', 'G', 'G']]
 
-twoPluses(grid)
+def twoPluses(grid):
+    pluses = getPluses(grid)
+    nums = []
+    for plus1 in pluses:
+        compatible = True
+        for plus2 in pluses:
+            for square1 in plus1:
+                for square2 in plus2:
+                    if square1[0] == square2[0] and square1[1] == square2[1]:
+                        compatible = False
+            if compatible == True:
+                nums.append(len(plus1) * len(plus2))
+    return max(nums)
+
+
+
+myGrid = [['G', 'G', 'G', 'G', 'G', 'G'],
+         ['G', 'B', 'B', 'B', 'G', 'B'],
+         ['G', 'G', 'G', 'G', 'G', 'G'],
+         ['G', 'G', 'B', 'B', 'G', 'B'],
+         ['G', 'G', 'G', 'G', 'G', 'G']]
+
+print(twoPluses(myGrid))
+
+
+
+
 
